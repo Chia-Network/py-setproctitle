@@ -7,6 +7,7 @@ jobs:
     name: Build wheel on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: False
       matrix:
         os: [macos-latest, ubuntu-18.04, windows-latest]
 
@@ -51,6 +52,7 @@ jobs:
     - name: Install twine
       run: pip install twine
     - name: Publish distribution to Test PyPI
+      if: 0
       env:
         TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
         TWINE_USERNAME: __token__
