@@ -9,7 +9,6 @@ jobs:
     strategy:
       fail-fast: False
       matrix:
-        pyver: [3.7, 3.8]
         os: [macos-latest, ubuntu-18.04, windows-latest]
 
     steps:
@@ -21,7 +20,12 @@ jobs:
     - uses: actions/setup-python@v1
       name: Install Python
       with:
-        python-version: ${{ matrix.pyver }}
+        python-version: 3.7
+
+    - uses: actions/setup-python@v1
+      name: Install Python
+      with:
+        python-version: 3.8
 
     - name: Install cibuildwheel
       run: |
@@ -37,7 +41,7 @@ jobs:
         python -m cibuildwheel --output-dir dist
       env:
         # build just python 3.7
-        CIBW_BUILD: cp37-*
+        CIBW_BUILD: cp37-* cp38-*
         # we need boost
         # we need pybind11 to be globally available for cibuildwheel
         CIBW_BEFORE_BUILD_LINUX: yum -y install boost-devel && python -m pip install --upgrade pip && pip install pybind11
