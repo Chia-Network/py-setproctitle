@@ -9,6 +9,7 @@ jobs:
     strategy:
       fail-fast: False
       matrix:
+        pyver: [3.7, 3.8]
         os: [macos-latest, ubuntu-18.04, windows-latest]
 
     steps:
@@ -20,7 +21,7 @@ jobs:
     - uses: actions/setup-python@v1
       name: Install Python
       with:
-        python-version: '3.7'
+        python-version: ${{ matrix.pyver }}
 
     - name: Install cibuildwheel
       run: |
