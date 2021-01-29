@@ -1,6 +1,33 @@
 Releases history
 ----------------
 
+Version 1.2.2
+-------------
+
+- Fixed Windows build (issues #89, #90).
+- Added wheel packages for Windows (issues #47, #90).
+- Added wheel packages for aarch64 (issues #95).
+
+
+Version 1.2.1
+-------------
+
+- Fixed segfault after ``os.environ.clear()`` (issue #88).
+
+
+Version 1.2
+~~~~~~~~~~~
+
+- added ``getthreadtitle()`` and ``setthreadtitle()``.
+- Initialisation of the module moved to the first usage: importing the module
+  doesn't cause side effects.
+- Manage much longer command lines (#52)
+- Improved build on BSD, dropped ancient versions (issue #67).
+- Fixed build for Python 3.8 (#66, #72)
+- Added support for Python 3.9
+- Dropped support for Python < 3.6
+
+
 Version 1.1.10
 ~~~~~~~~~~~~~~
 

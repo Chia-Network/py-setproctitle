@@ -3,13 +3,15 @@
  * spt_python.h
  *    Include and customize Python definitions.
  *
- * Copyright (c) 2010-2016 Daniele Varrazzo <daniele.varrazzo@gmail.com>
+ * Copyright (c) 2010-2020 Daniele Varrazzo <daniele.varrazzo@gmail.com>
  *
  *-------------------------------------------------------------------------
  */
 
 #ifndef SPT_PYTHON_H
 #define SPT_PYTHON_H
+
+#define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
 

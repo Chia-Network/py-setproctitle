@@ -3,6 +3,7 @@
 *.orig
 *.pyc
 *.rej
+*.html
 tools/pttest
 tools/sptdemo
 tools/prctl_demo
@@ -10,6 +11,8 @@ tools/ps_status.[ch]
 build
 dist
 py3
-tests/pyrun?
+tests/pyrun?.?
 env
 /setproctitle.egg-info
+/setproctitle.*.so
+/.tox

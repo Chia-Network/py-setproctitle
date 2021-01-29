@@ -3,7 +3,7 @@
  * setproctitle.c
  *    Python extension module to update and read the process title.
  *
- * Copyright (c) 2009-2016 Daniele Varrazzo <daniele.varrazzo@gmail.com>
+ * Copyright (c) 2009-2020 Daniele Varrazzo <daniele.varrazzo@gmail.com>
  *
  * The module allows Python code to access the functions get_ps_display()
  * and set_ps_display().
@@ -41,10 +41,15 @@ spt_setproctitle(PyObject *self, PyObject *args, PyObject *kwargs)
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s", kwlist, &title))
         return NULL;
 
-    set_ps_display(title, true);
+    /* Initialize the process title */
+    if (0 <= spt_setup()) {
+        set_ps_display(title, true);
+    }
+    else {
+        spt_debug("failed to initialize setproctitle");
+    }
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 
@@ -57,9 +62,45 @@ spt_getproctitle(PyObject *self, PyObject *args)
 {
     size_t tlen;
     const char *title;
+
+    spt_setup();
     title = get_ps_display(&tlen);
 
     return Py_BuildValue("s#", title, (int)tlen);
+}
+
+
+static char spt_setthreadtitle__doc__[] =
+"setthreadtitle(title) -- Change the thread title."
+;
+
+static PyObject *
+spt_setthreadtitle(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    const char *title = NULL;
+    static char *kwlist[] = {"title", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s", kwlist, &title))
+        return NULL;
+
+    set_thread_title(title);
+
+    Py_RETURN_NONE;
+}
+
+
+static char spt_getthreadtitle__doc__[] =
+"getthreadtitle() -- Return the thread title."
+;
+
+static PyObject *
+spt_getthreadtitle(PyObject *self, PyObject *args)
+{
+    char title[16] = {'\0'};
+
+    get_thread_title(title);
+
+    return Py_BuildValue("s", title);
 }
 
 
@@ -75,6 +116,16 @@ static struct PyMethodDef spt_methods[] = {
         (PyCFunction)spt_getproctitle,
         METH_NOARGS,
         spt_getproctitle__doc__},
+
+    {"setthreadtitle",
+        (PyCFunction)spt_setthreadtitle,
+        METH_VARARGS|METH_KEYWORDS,
+        spt_setthreadtitle__doc__},
+
+    {"getthreadtitle",
+        (PyCFunction)spt_getthreadtitle,
+        METH_NOARGS,
+        spt_getthreadtitle__doc__},
 
     {NULL, (PyCFunction)NULL, 0, NULL}        /* sentinel */
 };
@@ -122,16 +173,6 @@ INIT_MODULE(setproctitle)(void)
     d = PyModule_GetDict(m);
     spt_version = Py_BuildValue("s", xstr(SPT_VERSION));
     PyDict_SetItemString(d, "__version__", spt_version);
-
-    /* Initialize the process title */
-    if (0 > spt_setup()) {
-        spt_debug("failed to initialize module setproctitle");
-
-        /* Check for errors */
-        if (PyErr_Occurred()) {
-            spt_debug("an exception is set: import will fail");
-        }
-    }
 
 exit:
 

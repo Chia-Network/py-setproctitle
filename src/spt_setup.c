@@ -3,7 +3,7 @@
  * spt_setup.c
  *    Initalization code for the spt_status.c module functions.
  *
- * Copyright (c) 2009-2016 Daniele Varrazzo <daniele.varrazzo@gmail.com>
+ * Copyright (c) 2009-2020 Daniele Varrazzo <daniele.varrazzo@gmail.com>
  *
  *-------------------------------------------------------------------------
  */
@@ -13,15 +13,23 @@
 #include "spt.h"
 #include "spt_status.h"
 
+#include <string.h>
+
 /* Darwin doesn't export environ */
 #if defined(__darwin__)
 #include <crt_externs.h>
 #define environ (*_NSGetEnviron())
-#else
+#elif !defined(_WIN32)
 extern char **environ;
 #endif
 
 #ifndef WIN32
+
+/* I don't expect it to be defined: should include limits.h. But then it's
+ * another of those ./configure can of worms to find where it is... */
+#ifndef ARG_MAX
+#define ARG_MAX (96 * 1024)
+#endif
 
 /* Return a concatenated version of a strings vector.
  *
@@ -168,8 +176,13 @@ find_argv_from_env(int argc, char *arg0)
     /* Walk back from environ until you find argc-1 null-terminated strings.
      * Don't look for argv[0] as it's probably not preceded by 0. */
     ptr = environ[0];
+    if (!ptr) {
+        /* It happens on os.environ.clear() */
+        spt_debug("environ pointer is NULL");
+        goto exit;
+    }
     spt_debug("found environ at %p", ptr);
-    limit = ptr - 8192;  /* TODO: empiric limit: should use MAX_ARG */
+    limit = ptr - ARG_MAX;
     --ptr;
     for (i = argc - 1; i >= 1; --i) {
         if (*ptr) {
@@ -462,7 +475,15 @@ exit:
 int
 spt_setup(void)
 {
-    int rv = -1;
+    const int not_happened = 3;
+    static int rv = 3;
+
+    /* Make sure setup happens just once, either successful or failed */
+    if (rv != not_happened) {
+        return rv;
+    }
+
+    rv = -1;
 
 #ifndef WIN32
     int argc = 0;

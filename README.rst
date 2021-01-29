@@ -1,6 +1,10 @@
 A Python module to customize the process title
 ==============================================
 
+.. image:: https://github.com/dvarrazzo/py-setproctitle/workflows/Tests/badge.svg
+    :target: https://github.com/dvarrazzo/py-setproctitle/actions?query=workflow%3ATests
+    :alt: Tests
+
 :author: Daniele Varrazzo
 
 The ``setproctitle`` module allows a process to change its title (as displayed
@@ -29,8 +33,9 @@ Installation
 ------------
 
 ``setproctitle`` is a C extension: in order to build it you will need a C
-compiler and the Python development support (the ``python-dev`` package in
-most Linux distributions). No further external dependencies are required.
+compiler and the Python development support (the ``python-dev`` or
+``python3-dev`` package in most Linux distributions). No further external
+dependencies are required.
 
 You can use ``pip`` to install the module::
 
@@ -44,18 +49,16 @@ all the details.
 .. _virtualenv: https://virtualenv.readthedocs.org/
 
 
-Python 3 support
-~~~~~~~~~~~~~~~~
-
-As of version 1.1 the module works with Python 3. Just use
-``pip``/``virtualenv`` for Python 3.
-
-In order to build from the source package and test the module under Python 3,
-the ``Makefile`` contains some helper targets.
-
-
 Usage
 -----
+
+.. note::
+   You should import and use the module (even just calling ``getproctitle()``)
+   pretty early in your program lifetime: code writing env vars `may
+   interfere`__ with the module initialisation.
+
+    .. __: https://github.com/dvarrazzo/py-setproctitle/issues/42
+
 
 The ``setproctitle`` module exports the following functions:
 
@@ -64,6 +67,21 @@ The ``setproctitle`` module exports the following functions:
 
 ``getproctitle()``
     Return the current process title.
+
+The process title is usually visible in files such as ``/proc/PID/cmdline``,
+``/proc/PID/status``, ``/proc/PID/comm``, depending on the operating system
+and kernel version. These information are used by user-space tools such as
+``ps`` and ``top``.
+
+
+``setthreadtitle(title)``
+    Set *title* as the title for the current thread.
+
+``getthreadtitle()``
+    Get the current thread title.
+
+The thread title is exposed by some operating systems as the file
+``/proc/PID/task/TID/comm``, which is used by certain tools such as ``htop``.
 
 
 Environment variables
@@ -111,15 +129,3 @@ The module can probably work on HP-UX, but I haven't found any to test with.
 It is unlikely that it can work on Solaris instead.
 
 .. _Process Explorer: http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx
-
-
-Other known implementations and discussions
--------------------------------------------
-
-- `procname`_: a module exposing the same functionality, but less portable
-  and not well packaged.
-- `Issue 5672`_: where the introduction of such functionality into the stdlib
-  is being discussed.
-
-.. _procname: http://code.google.com/p/procname/
-.. _Issue 5672: http://bugs.python.org/issue5672

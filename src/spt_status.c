@@ -5,7 +5,7 @@
  * Mechanism differs wildly across platforms.
  *
  * Copyright (c) 2000-2009, PostgreSQL Global Development Group
- * Copyright (c) 2009-2016 Daniele Varrazzo <daniele.varrazzo@gmail.com>
+ * Copyright (c) 2009-2020 Daniele Varrazzo <daniele.varrazzo@gmail.com>
  * various details abducted from various places
  *
  * This file was taken from PostgreSQL. The PostgreSQL copyright terms follow.
@@ -434,3 +434,20 @@ get_ps_display(size_t *displen)
     return ps_buffer + ps_buffer_fixed_size;
 }
 
+
+void
+set_thread_title(const char *title)
+{
+#ifdef PS_USE_PRCTL
+    prctl(PR_SET_NAME, title);
+#endif
+}
+
+
+void
+get_thread_title(char *title)
+{
+#ifdef PS_USE_PRCTL
+    prctl(PR_GET_NAME, title);
+#endif
+}
