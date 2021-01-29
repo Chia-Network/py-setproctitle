@@ -118,7 +118,7 @@ jobs:
 
 
   build-macos-x64:
-    name: Build Windows packages
+    name: Build MacOS packages
     runs-on: macos-latest
     strategy:
       matrix:
