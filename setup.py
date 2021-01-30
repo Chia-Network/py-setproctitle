@@ -2,7 +2,7 @@
 """
 setproctitle setup script.
 
-Copyright (c) 2009-2020 Daniele Varrazzo <daniele.varrazzo@gmail.com>
+Copyright (c) 2009-2021 Daniele Varrazzo <daniele.varrazzo@gmail.com>
 """
 
 import sys
@@ -12,7 +12,7 @@ try:
 except ImportError:
     from distutils.core import setup, Extension
 
-VERSION = "1.2.2"
+VERSION = "1.2.3.dev0"
 
 define_macros = {}
 define_macros["SPT_VERSION"] = VERSION
